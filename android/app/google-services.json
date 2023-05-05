@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "296582121183",
+    "project_id": "let-me-grab-news-app",
+    "storage_bucket": "let-me-grab-news-app.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:296582121183:android:1295d37b5f73efd8e78b6a",
+        "android_client_info": {
+          "package_name": "com.letmegrab.newsapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "296582121183-5tv2ctc3rfjla2qsdf08n0o6jdj39q9d.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAaMZyBDPNHx0c-3QRlBoIfB-cvY-FFwSQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "296582121183-5tv2ctc3rfjla2qsdf08n0o6jdj39q9d.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

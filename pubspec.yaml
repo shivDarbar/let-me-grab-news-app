@@ -13,6 +13,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  firebase_core: 
+  cloud_firestore: 
+  provider: 
 
   cupertino_icons: ^1.0.2
 
