@@ -1,7 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:let_me_grab_news_app/providers/firebase_provider.dart';
-import 'package:let_me_grab_news_app/screens/login_screen.dart';
+import 'package:let_me_grab_news_app/providers/news_provider.dart';
+import 'package:let_me_grab_news_app/screens/category_screen.dart';
 import 'package:provider/provider.dart';
 
 Future<void> main() async {
@@ -22,13 +23,16 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider<FirebaseProvider>(
           create: (context) => FirebaseProvider(),
         ),
+        ChangeNotifierProvider<NewsProvider>(
+          create: (context) => NewsProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Flutter Demo',
         theme: ThemeData(
           primarySwatch: Colors.blue,
         ),
-        home: const LoginScreen(),
+        home: const CategoryScreen(),
       ),
     );
   }

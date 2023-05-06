@@ -3,7 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
 import '../models/user.dart';
-import '../screens/home_screen.dart';
+import '../screens/category_screen.dart';
 
 class FirebaseProvider with ChangeNotifier {
   final List<User> _userList = [];
@@ -150,7 +150,7 @@ class FirebaseProvider with ChangeNotifier {
             Navigator.pushReplacement(
               context,
               MaterialPageRoute(
-                builder: (context) => const HomeScreen(),
+                builder: (context) => const CategoryScreen(),
               ),
             );
           },
@@ -180,7 +180,7 @@ class FirebaseProvider with ChangeNotifier {
           mySnackBar(context: context, text: 'Logged in Successfully.');
           clearTextControllers();
           Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const HomeScreen()));
+              MaterialPageRoute(builder: (context) => const CategoryScreen()));
         } else {
           mySnackBar(
               context: context,
