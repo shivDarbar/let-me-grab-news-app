@@ -14,10 +14,12 @@ dependencies:
   flutter:
     sdk: flutter
   firebase_core: 
+  firebase_auth:
   cloud_firestore: 
   provider: 
   font_awesome_flutter:
   http:
+  shared_preferences:
 
   cupertino_icons: ^1.0.2
 

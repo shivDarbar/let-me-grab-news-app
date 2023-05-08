@@ -16,22 +16,26 @@ class LoginScreen extends StatelessWidget {
       backgroundColor: Colors.grey.shade300,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Login Screen'),
+        title: const Text('Login'),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: mediaQuery.size.width * 0.05),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
               height: 10,
             ),
             const Padding(
               padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "User Name",
-                style: TextStyle(
-                  fontSize: 16,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  "Email",
+                  style: TextStyle(
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ),
@@ -40,14 +44,14 @@ class LoginScreen extends StatelessWidget {
             ),
             MyTextField(
               showBorder: false,
-              hintText: "Abc@123",
-              controller: firebaseProvider.userNameController,
+              hintText: "abc@letmegrab.com",
+              controller: firebaseProvider.emailController,
               obscureText: false,
               onChanged: (value) {
-                firebaseProvider.getUserName();
+                firebaseProvider.getEmail();
               },
               onSubmitted: (value) {
-                firebaseProvider.getUserName();
+                firebaseProvider.getEmail();
               },
             ),
             const SizedBox(
@@ -93,7 +97,7 @@ class LoginScreen extends StatelessWidget {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    firebaseProvider.loginUser(context);
+                    firebaseProvider.signUserIn(context);
                   },
                   child: const Text(
                     'Login',

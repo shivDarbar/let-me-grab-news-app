@@ -1,29 +1,15 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'package:flutter/material.dart';
+import 'package:let_me_grab_news_app/helpers/user_preferences.dart';
 
-import '../models/user.dart';
 import '../screens/category_screen.dart';
 
 class FirebaseProvider with ChangeNotifier {
-  final List<User> _userList = [];
-  List<User> get userList {
-    return [..._userList];
-  }
-
   String? _email;
   String? get email => _email;
   String? _password;
   String? get password => _password;
-  String? _userName;
-  String? get userName => _userName;
-  String? _newPassword;
-  String? get newPassword => _newPassword;
-
-  String? _role = 'Admin';
-  String? get role => _role;
-
-  bool userNameAvailable = false;
 
   bool _showPassWord = false;
   bool get showPassWord => _showPassWord;
@@ -32,19 +18,9 @@ class FirebaseProvider with ChangeNotifier {
 
   TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
-  TextEditingController newPasswordController = TextEditingController();
-
-  TextEditingController userNameController = TextEditingController();
-
-  List<String> roleItems = ['Admin', 'Viewer'];
 
   toggleShowPassWord() {
     _showPassWord = !_showPassWord;
-    notifyListeners();
-  }
-
-  getRole(String value) {
-    _role = value;
     notifyListeners();
   }
 
@@ -56,14 +32,6 @@ class FirebaseProvider with ChangeNotifier {
     _password = passwordController.text;
   }
 
-  getNewPassword() {
-    _newPassword = newPasswordController.text;
-  }
-
-  getUserName() {
-    _userName = userNameController.text;
-  }
-
   mySnackBar({
     required BuildContext context,
     required String text,
@@ -73,21 +41,6 @@ class FirebaseProvider with ChangeNotifier {
         content: Text(text),
       ),
     );
-  }
-
-  checkIfUserNameAvailable() async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    if (userNameController.text.isNotEmpty) {
-      var userRef = await db.collection('users').doc(_userName).get();
-
-      if (userRef.exists) {
-        userNameAvailable = false;
-      } else {
-        userNameAvailable = true;
-      }
-      notifyListeners();
-    }
-    return userNameAvailable;
   }
 
   String? validateEmail(String value) {
@@ -118,120 +71,75 @@ class FirebaseProvider with ChangeNotifier {
     }
   }
 
-  registerUser({
-    required BuildContext context,
-    required bool isRegister,
-  }) async {
-    if (_userName!.isNotEmpty) {
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      var userNameAvailable = await checkIfUserNameAvailable();
-      if (userNameAvailable) {
-        DocumentReference roomRef = db.collection('users').doc(_userName);
-        currentUser = User(
-          userName: _userName!,
+  Future<bool> registerUserWithFirebase(BuildContext context) async {
+    if (_email!.isNotEmpty && _password!.isNotEmpty) {
+      try {
+        User? user;
+        FirebaseAuth auth = FirebaseAuth.instance;
+        UserCredential userCredential =
+            await auth.createUserWithEmailAndPassword(
           email: _email!,
           password: _password!,
         );
+        user = userCredential.user;
+        await user!.updateProfile();
+        await user.reload();
+        user = auth.currentUser;
+        UserPreferences.setuserLogin(true);
 
-        roomRef.set({
-          'userName': _userName,
-          'email': _email,
-          'password': _password,
-          'role': _role,
-        }).then(
-          (value) async {
-            await getUserList();
-            mySnackBar(
-                context: context,
-                text: isRegister
-                    ? 'Registered Successfully.'
-                    : 'User added Successfully.');
-            clearTextControllers();
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const CategoryScreen(),
+        return true;
+      } catch (error) {
+        if (error is FirebaseAuthException) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                error.toString(),
               ),
-            );
+            ),
+          );
+        }
+      }
+    }
+    return false;
+  }
+
+  void signUserIn(BuildContext context) async {
+    if (_email!.isNotEmpty && _password!.isNotEmpty) {
+      try {
+        var login = await FirebaseAuth.instance
+            .signInWithEmailAndPassword(
+                email: emailController.text, password: passwordController.text)
+            .then(
+          (value) {
+            UserPreferences.setuserLogin(true);
+
+            Navigator.of(context).pushReplacement(MaterialPageRoute(
+                builder: (context) => const CategoryScreen()));
           },
         );
-      } else {
-        mySnackBar(context: context, text: 'User Name not avilable!');
+        print(login);
+      } on FirebaseAuthException catch (e) {
+        showErrorMessage(message: e.code, context: context);
       }
     }
   }
 
-  loginUser(BuildContext context) async {
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    if (_userName == null || _password == null) {
-      mySnackBar(context: context, text: 'Please fill all the fields.');
-    } else {
-      var userRef = await db.collection('users').doc(_userName).get();
-      if (userRef.exists) {
-        await getUserList();
-        var userData = userRef.data();
-        if (_userName == userData!['userName'] &&
-            _password == userData['password']) {
-          currentUser = User(
-            userName: userData['userName'],
-            email: userData['email'],
-            password: userData['password'],
-          );
-          mySnackBar(context: context, text: 'Logged in Successfully.');
-          clearTextControllers();
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const CategoryScreen()));
-        } else {
-          mySnackBar(
-              context: context,
-              text: 'Please type correct User name and Password.');
-        }
-      } else {
-        mySnackBar(context: context, text: 'User not found.');
-      }
-    }
+  Future<void> signOut() async {
+    await FirebaseAuth.instance.signOut();
+    UserPreferences.setuserLogin(false);
   }
 
-  clearTextControllers() {
-    emailController.clear();
-    passwordController.clear();
-    userNameController.clear();
-  }
-
-  changePassword(BuildContext context) async {
-    if (_password == currentUser!.password) {
-      FirebaseFirestore db = FirebaseFirestore.instance;
-      var userRef = db.collection('users').doc(_userName);
-      userRef.set({'password': _newPassword}, SetOptions(merge: true));
-      mySnackBar(context: context, text: 'Password changed successfully.');
-      passwordController.clear();
-      newPasswordController.clear();
-      Navigator.pop(context);
-    } else {
-      mySnackBar(context: context, text: 'Please enter a correct Password.');
-    }
-  }
-
-  checkPassword(BuildContext context) {
-    if (_password != currentUser!.password) {
-      mySnackBar(context: context, text: 'Please Enter correct PassWord');
-    }
-  }
-
-  getUserList() async {
-    _userList.clear();
-    FirebaseFirestore db = FirebaseFirestore.instance;
-    var users = await db.collection('users').get();
-
-    users.docs.map((doc) => doc.data()).forEach((user) {
-      var temp = User(
-        userName: user['userName'],
-        email: user['email'],
-        password: user['password'],
-      );
-      _userList.add(temp);
-    });
-
-    notifyListeners();
+  void showErrorMessage({
+    required String message,
+    required BuildContext context,
+  }) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(message),
+        );
+      },
+    );
   }
 }

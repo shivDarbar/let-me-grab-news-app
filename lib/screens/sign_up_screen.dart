@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:let_me_grab_news_app/screens/category_screen.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/firebase_provider.dart';
@@ -16,12 +17,13 @@ class SignUpScreen extends StatelessWidget {
       backgroundColor: Colors.grey.shade300,
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Sign Up Screen'),
+        title: const Text('Sign Up'),
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: mediaQuery.size.width * 0.05),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const SizedBox(
               height: 5,
@@ -105,45 +107,28 @@ class SignUpScreen extends StatelessWidget {
                 }
               },
             ),
-            const SizedBox(
-              height: 10,
-            ),
-            const Padding(
-              padding: EdgeInsets.only(left: 10),
-              child: Text(
-                "User Name",
-                style: TextStyle(
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            const SizedBox(
-              height: 10,
-            ),
-            MyTextField(
-              showBorder: false,
-              hintText: "Abc@123",
-              controller: firebaseProvider.userNameController,
-              obscureText: false,
-              onChanged: (value) {
-                firebaseProvider.getUserName();
-              },
-              onSubmitted: (value) {
-                firebaseProvider.getUserName();
-              },
-            ),
             SizedBox(
-              height: mediaQuery.size.height * 0.1,
+              height: mediaQuery.size.height * 0.05,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    firebaseProvider.registerUser(
-                      context: context,
-                      isRegister: true,
-                    );
+                    firebaseProvider
+                        .registerUserWithFirebase(
+                      context,
+                    )
+                        .then((value) {
+                      if (value) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const CategoryScreen(),
+                          ),
+                        );
+                      }
+                    });
                   },
                   child: const Text(
                     'Register',
