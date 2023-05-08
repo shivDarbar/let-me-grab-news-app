@@ -120,9 +120,11 @@ class LoginScreen extends StatelessWidget {
                     ),
                   ),
                   onPressed: () => Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => const SignUpScreen())),
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const SignUpScreen(),
+                    ),
+                  ),
                 ),
               ],
             ),

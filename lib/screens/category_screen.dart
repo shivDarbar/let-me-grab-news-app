@@ -31,10 +31,11 @@ class CategoryScreen extends StatelessWidget {
                         onPressed: () {
                           firebaseProvider.signOut().then(
                             (value) {
-                              Navigator.of(context).pushReplacement(
+                              Navigator.of(context).pushAndRemoveUntil<dynamic>(
                                 MaterialPageRoute(
                                   builder: (context) => const LoginScreen(),
                                 ),
+                                (route) => false,
                               );
                             },
                           );
